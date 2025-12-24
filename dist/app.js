@@ -1,9 +1,23 @@
 import express from "express";
+import cors from "cors";
+import notFound from "./middlewares/notFound.middleware.js";
+import { globalErrorHandler } from './utils/errorHandler.js';
+import userRouter from "./modules/user/user.route.js";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
-/* Middleware */
+app.use(cors());
 app.use(express.json());
-/* Health check */
-app.get("/health", (_, res) => {
+// app.use((req, _res, next) => {
+//   console.log("Incoming request:", req.method, req.url);
+//   next();
+// });
+app.get("/health", (req, res) => {
+    console.log("hiting");
     res.json({ status: "OK", message: "Server is healthy" });
 });
+// api routes 
+app.use("/api/user", userRouter);
+app.use(globalErrorHandler);
+app.use(notFound);
 export default app;
