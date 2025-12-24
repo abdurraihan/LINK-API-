@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/jwt.utils.js";
 
-// Extend Express Request type to include userId
+
 declare global {
   namespace Express {
     interface Request {
@@ -10,16 +10,14 @@ declare global {
   }
 }
 
-/**
- * Middleware to verify JWT token and authenticate user
- */
+
 export const verifyUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // Get token from Authorization header
+    
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -29,7 +27,7 @@ export const verifyUser = async (
       });
     }
 
-    // Extract token
+ 
     const token = authHeader.split(" ")[1];
 
     if (!token) {
@@ -39,10 +37,10 @@ export const verifyUser = async (
       });
     }
 
-    // Verify token
+  
     const decoded = verifyAccessToken(token);
 
-    // Attach user ID to request object
+   
     req.userId = decoded.id;
 
     next();
@@ -69,9 +67,7 @@ export const verifyUser = async (
   }
 };
 
-/**
- * Optional middleware - doesn't fail if token is missing
- */
+
 export const verifyUserOptional = async (
   req: Request,
   res: Response,
@@ -90,7 +86,7 @@ export const verifyUserOptional = async (
     
     next();
   } catch (error) {
-    // Continue without authentication
+    
     next();
   }
 };

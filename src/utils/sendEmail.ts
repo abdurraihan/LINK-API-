@@ -21,6 +21,6 @@ export const sendOTPEmail = async (email: string, otp: string) => {
     console.log("SendGrid success:", response[0].statusCode);
   } catch (error: any) {
     console.error("SendGrid error:", error?.response?.body || error);
-    throw error; // VERY important
+    throw error; 
   }
 };

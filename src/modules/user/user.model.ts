@@ -7,7 +7,7 @@ export interface IUser extends Document {
   avatar: string;
   isVerified: boolean;
   otp?: string;
-  refreshToken?: string; // Added this line
+  refreshToken?: string; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,7 +21,7 @@ const userSchema = new Schema<IUser>(
     email: {
       type: String,
       required: true,
-      // unique: true,
+  
     },
     password: {
       type: String,

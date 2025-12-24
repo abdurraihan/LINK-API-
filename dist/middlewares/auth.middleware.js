@@ -1,10 +1,6 @@
 import { verifyAccessToken } from "../utils/jwt.utils.js";
-/**
- * Middleware to verify JWT token and authenticate user
- */
 export const verifyUser = async (req, res, next) => {
     try {
-        // Get token from Authorization header
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
@@ -12,7 +8,6 @@ export const verifyUser = async (req, res, next) => {
                 message: "No token provided. Authorization denied.",
             });
         }
-        // Extract token
         const token = authHeader.split(" ")[1];
         if (!token) {
             return res.status(401).json({
@@ -20,9 +15,7 @@ export const verifyUser = async (req, res, next) => {
                 message: "No token provided. Authorization denied.",
             });
         }
-        // Verify token
         const decoded = verifyAccessToken(token);
-        // Attach user ID to request object
         req.userId = decoded.id;
         next();
     }
@@ -47,9 +40,6 @@ export const verifyUser = async (req, res, next) => {
         });
     }
 };
-/**
- * Optional middleware - doesn't fail if token is missing
- */
 export const verifyUserOptional = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
@@ -63,7 +53,6 @@ export const verifyUserOptional = async (req, res, next) => {
         next();
     }
     catch (error) {
-        // Continue without authentication
         next();
     }
 };
