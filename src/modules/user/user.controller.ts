@@ -10,6 +10,10 @@ import {
     verifyRefreshToken
 } from "../../utils/jwt.utils.js";
 
+
+// User Auth API's start 
+
+
 // Signup API with Email Verification
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
@@ -75,7 +79,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email }).lean();
+        const user = await User.findOne({ email }).select('username email ');
 
         if (!user) {
             return res.status(404).json({
@@ -101,11 +105,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
         const { access_token, refresh_token } = generateTokens(user._id.toString());
 
-        const { username, email: userEmail, avatar } = user;
+
 
         res.status(200).json({
             status: "success",
-            data: { username, email: userEmail, avatar },
+            data: user,
             access_token,
             refresh_token,
         });
@@ -119,7 +123,7 @@ export const SocialLogin = async (req: Request, res: Response, next: NextFunctio
     const { name, email, photo } = req.body;
 
     try {
-        let user = await User.findOne({ email }).lean();
+        let user = await User.findOne({ email }).select('username email');
 
         if (!user) {
             const generatedPassword = Math.random().toString(36).slice(-8);
@@ -132,19 +136,13 @@ export const SocialLogin = async (req: Request, res: Response, next: NextFunctio
                 avatar: photo,
                 isVerified: true,
             });
-
-            await newUser.save();
-            user = newUser.toObject();
         }
 
         const { access_token, refresh_token } = generateTokens(user._id.toString());
 
-   
-        const { username, email: userEmail, avatar } = user;
-
         res.status(200).json({
             status: "success",
-            data: { username, email: userEmail, avatar },
+            data: user,
             access_token,
             refresh_token,
         });
@@ -221,12 +219,34 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
 };
 
 
+//delete user         
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+
+    const userID = req.userId
+
+    if (!userID) {
+        return res.status(400).json({ status: "fail", message: "invelide user" });
+    }
+
+    try {
+        const user = await User.findByIdAndDelete(userID);
+        if (!user) {
+            res.status(404).json({ status: "fail", message: "user already deleted" })
+        }
+        res.status(200).json({ status: "success", data: user, message: "user has been deleted" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 //Request OTP for password reset
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
 
-      
+
         if (!email) {
             return res.status(400).json({
                 success: false,
@@ -234,7 +254,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
             });
         }
 
-      
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({
@@ -245,7 +265,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
         const otp = generateOTP();
 
-        
+
         user.otp = otp;
         await user.save();
 
@@ -312,7 +332,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     try {
         const { email, otp, newPassword, confirmPassword } = req.body;
 
-       
+
         if (!email || !otp || !newPassword || !confirmPassword) {
             return res.status(400).json({
                 success: false,
@@ -348,7 +368,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
         const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
-        
+
         user.password = hashedPassword;
         user.otp = undefined;
         await user.save();
@@ -414,3 +434,31 @@ export const resendOTP = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+
+// User profile Related API Start from here 
+
+export const getUserProfile = async (req: Request, res: Response) => {
+    try {
+        const userID = req.userId
+
+        if (!userID) {
+            return res.status(400).json({ status: "fail", message: "invelide user" });
+        }
+
+        const user = await User.findById(userID).select('username email avatar -_id');
+        if (!user) {
+            res.status(400).json({ status: "fail", message: "user not exise" })
+        }
+        res.status(200).json({ status: "success", data: user, message: "user find successfully" })
+
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "can't find the user profile ",
+            error: error.message,
+        });
+    }
+}

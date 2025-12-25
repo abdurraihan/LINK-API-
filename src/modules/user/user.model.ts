@@ -7,7 +7,7 @@ export interface IUser extends Document {
   avatar: string;
   isVerified: boolean;
   otp?: string;
-  refreshToken?: string; 
+  refreshToken?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,15 +17,28 @@ const userSchema = new Schema<IUser>(
     username: {
       type: String,
       required: true,
+      trim: true,
+      minlength: [2, 'Username must be at least 2 characters long'],
+      maxlength: [50, 'Username cannot exceed 50 characters'],
+      match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
     },
     email: {
       type: String,
       required: true,
-  
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: function (v: string) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: 'Please enter a valid email address'
+      }
     },
     password: {
       type: String,
       required: true,
+      minlength: [6, 'Password must be at least 6 characters long']
     },
     avatar: {
       type: String,
@@ -39,12 +52,9 @@ const userSchema = new Schema<IUser>(
     otp: {
       type: String,
       required: false,
-      expires: 300, 
+      expires: 300,
     },
-    refreshToken: { 
-      type: String,
-      required: false,
-    },
+
   },
   { timestamps: true }
 );
