@@ -2,7 +2,10 @@ import bcryptjs from "bcrypt";
 import User from "./user.model.js";
 import { sendOTPEmail } from "../../utils/sendEmail.js";
 import { generateOTP } from "../../utils/otp.js";
+import { deleteFromS3 } from "../../utils/deleteFromS3.js";
+import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
 import { generateTokens, generateAccessToken, verifyRefreshToken } from "../../utils/jwt.utils.js";
+// User Auth API's start 
 // Signup API with Email Verification
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
@@ -53,7 +56,7 @@ export const verifyEmail = async (req, res, next) => {
 export const login = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email }).lean();
+        const user = await User.findOne({ email }).select('username email ');
         if (!user) {
             return res.status(404).json({
                 status: "error",
@@ -74,10 +77,9 @@ export const login = async (req, res, next) => {
             });
         }
         const { access_token, refresh_token } = generateTokens(user._id.toString());
-        const { username, email: userEmail, avatar } = user;
         res.status(200).json({
             status: "success",
-            data: { username, email: userEmail, avatar },
+            data: user,
             access_token,
             refresh_token,
         });
@@ -90,7 +92,7 @@ export const login = async (req, res, next) => {
 export const SocialLogin = async (req, res, next) => {
     const { name, email, photo } = req.body;
     try {
-        let user = await User.findOne({ email }).lean();
+        let user = await User.findOne({ email }).select('username email');
         if (!user) {
             const generatedPassword = Math.random().toString(36).slice(-8);
             const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
@@ -101,14 +103,11 @@ export const SocialLogin = async (req, res, next) => {
                 avatar: photo,
                 isVerified: true,
             });
-            await newUser.save();
-            user = newUser.toObject();
         }
         const { access_token, refresh_token } = generateTokens(user._id.toString());
-        const { username, email: userEmail, avatar } = user;
         res.status(200).json({
             status: "success",
-            data: { username, email: userEmail, avatar },
+            data: user,
             access_token,
             refresh_token,
         });
@@ -163,6 +162,23 @@ export const changePassword = async (req, res, next) => {
         user.password = hashedPassword;
         await user.save();
         res.status(200).json({ status: "success", message: "Password updated successfully." });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+//delete user         
+export const deleteUser = async (req, res, next) => {
+    const userID = req.userId;
+    if (!userID) {
+        return res.status(400).json({ status: "fail", message: "invelide user" });
+    }
+    try {
+        const user = await User.findByIdAndDelete(userID);
+        if (!user) {
+            res.status(404).json({ status: "fail", message: "user already deleted" });
+        }
+        res.status(200).json({ status: "success", data: user, message: "user has been deleted" });
     }
     catch (error) {
         next(error);
@@ -330,6 +346,87 @@ export const resendOTP = async (req, res) => {
             success: false,
             message: "Failed to resend OTP",
             error: error.message,
+        });
+    }
+};
+export const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            return res.status(401).json({
+                status: "fail",
+                message: "Invalid user",
+            });
+        }
+        const user = await User.findById(userId).select("username email avatarKey");
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found",
+            });
+        }
+        let avatarUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+        if (user.avatarKey) {
+            avatarUrl = await getSignedAvatarUrl(user.avatarKey);
+        }
+        return res.status(200).json({
+            status: "success",
+            message: "User fetched successfully",
+            data: {
+                username: user.username,
+                email: user.email,
+                avatar: avatarUrl,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Get profile error:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Can't find user profile",
+        });
+    }
+};
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { username } = req.body;
+        const file = req.file;
+        if (!userId) {
+            return res.status(401).json({ status: "fail", message: "Unauthorized" });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ status: "fail", message: "User not found" });
+        }
+        if (username) {
+            user.username = username;
+        }
+        if (file) {
+            if (user.avatarKey) {
+                await deleteFromS3(user.avatarKey);
+            }
+            user.avatarKey = file.key;
+        }
+        await user.save();
+        let avatarUrl = user.avatar;
+        if (user.avatarKey) {
+            avatarUrl = await getSignedAvatarUrl(user.avatarKey);
+        }
+        return res.status(200).json({
+            status: "success",
+            message: "Profile updated",
+            data: {
+                id: user._id,
+                username: user.username,
+                avatar: avatarUrl,
+            },
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            status: "error",
+            message: error.message,
         });
     }
 };

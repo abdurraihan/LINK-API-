@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatar: string;
+   avatarKey?: string;
   isVerified: boolean;
   otp?: string;
   refreshToken?: string;
@@ -44,6 +45,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       default:
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+    },
+     avatarKey: {
+      type: String,
+      required: false, // NEW FIELD
     },
     isVerified: {
       type: Boolean,

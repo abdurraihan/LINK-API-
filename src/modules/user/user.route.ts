@@ -11,9 +11,12 @@ import {
     resetPassword,
     resendOTP,
     deleteUser,
-    getUserProfile
+    getUserProfile,
+      updateProfile
 } from "./user.controller.js";
 import { verifyUser } from "../../middlewares/auth.middleware.js";
+import { uploadAvatar } from "../../middlewares/uploadAvater.js";
+
 const router = express.Router();
 
 
@@ -31,5 +34,11 @@ router.post("/resend-otp", resendOTP);
 
 // user profile routs
 router.get("/get-user-profile",verifyUser,getUserProfile);
+router.patch(
+  "/profile",
+  verifyUser,
+  uploadAvatar.single("avatar"),
+  updateProfile
+);
 
 export default router;

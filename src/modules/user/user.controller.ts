@@ -4,6 +4,8 @@ import bcryptjs from "bcrypt";
 import User from "./user.model.js";
 import { sendOTPEmail } from "../../utils/sendEmail.js";
 import { generateOTP } from "../../utils/otp.js";
+import { deleteFromS3 } from "../../utils/deleteFromS3.js";
+import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
 import {
     generateTokens,
     generateAccessToken,
@@ -437,28 +439,104 @@ export const resendOTP = async (req: Request, res: Response) => {
 
 
 
-// User profile Related API Start from here 
 
 export const getUserProfile = async (req: Request, res: Response) => {
-    try {
-        const userID = req.userId
+  try {
+    const userId = req.userId;
 
-        if (!userID) {
-            return res.status(400).json({ status: "fail", message: "invelide user" });
-        }
-
-        const user = await User.findById(userID).select('username email avatar -_id');
-        if (!user) {
-            res.status(400).json({ status: "fail", message: "user not exise" })
-        }
-        res.status(200).json({ status: "success", data: user, message: "user find successfully" })
-
-    } catch (error) {
-        console.error("Forgot password error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "can't find the user profile ",
-            error: error.message,
-        });
+    if (!userId) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Invalid user",
+      });
     }
-}
+
+    const user = await User.findById(userId).select(
+      "username email avatarKey"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    let avatarUrl =
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+
+    if (user.avatarKey) {
+      avatarUrl = await getSignedAvatarUrl(user.avatarKey);
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "User fetched successfully",
+      data: {
+        username: user.username,
+        email: user.email,
+        avatar: avatarUrl,
+      },
+    });
+  } catch (error: any) {
+    console.error("Get profile error:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Can't find user profile",
+    });
+  }
+};
+
+
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+    const { username } = req.body;
+    const file = req.file as any;
+
+    if (!userId) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    if (username) {
+      user.username = username;
+    }
+
+    if (file) {
+      if (user.avatarKey) {
+        await deleteFromS3(user.avatarKey);
+      }
+
+      user.avatarKey = file.key;
+    }
+
+    await user.save();
+
+    let avatarUrl = user.avatar;
+    if (user.avatarKey) {
+      avatarUrl = await getSignedAvatarUrl(user.avatarKey);
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Profile updated",
+      data: {
+        id: user._id,
+        username: user.username,
+        avatar: avatarUrl,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
