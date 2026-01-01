@@ -3,8 +3,10 @@ import {Request, Response } from "express";
 import cors from "cors"
 import notFound from "./middlewares/notFound.middleware.js";
 import { globalErrorHandler } from './utils/errorHandler.js';
-import userRouter from "./modules/user/user.route.js"; 
+import userRouter from "./modules/user/user.route.js";
+import channelRouter from "./modules/channel/chennel.route.js";
 import dotenv from "dotenv";
+
 
 dotenv.config();
 
@@ -27,6 +29,7 @@ app.get("/health", (req:Request, res:Response) => {
 
 // api routes 
 app.use("/api/user", userRouter);
+app.use("/api/channel",channelRouter);
 
 
 

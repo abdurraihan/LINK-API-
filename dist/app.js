@@ -3,6 +3,7 @@ import cors from "cors";
 import notFound from "./middlewares/notFound.middleware.js";
 import { globalErrorHandler } from './utils/errorHandler.js';
 import userRouter from "./modules/user/user.route.js";
+import channelRouter from "./modules/channel/chennel.route.js";
 import dotenv from "dotenv";
 dotenv.config();
 const app = express();
@@ -18,6 +19,7 @@ app.get("/health", (req, res) => {
 });
 // api routes 
 app.use("/api/user", userRouter);
+app.use("/api/channel", channelRouter);
 app.use(globalErrorHandler);
 app.use(notFound);
 export default app;

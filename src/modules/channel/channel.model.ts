@@ -4,12 +4,8 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 export interface IChannel extends Document {
   channelName: string;
   description?: string;
-
   channelIcon: string;
-  channelIconKey?: string;
-
   owner: Types.ObjectId; 
-
   links?:string;
 
  // channel stastesitc 
@@ -43,10 +39,6 @@ const channelSchema = new Schema<IChannel>(
       type: String,
       required: true,
       
-    },
-
-    channelIconKey: {
-      type: String,
     },
 
     owner: {

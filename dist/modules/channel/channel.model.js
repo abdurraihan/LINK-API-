@@ -18,9 +18,6 @@ const channelSchema = new Schema({
         type: String,
         required: true,
     },
-    channelIconKey: {
-        type: String,
-    },
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User",
