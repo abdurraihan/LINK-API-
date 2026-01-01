@@ -1,7 +1,7 @@
 import express from "express";
 import { signup, verifyEmail, login, SocialLogin, refreshAccessToken, changePassword, forgotPassword, verifyResetOTP, resetPassword, resendOTP, deleteUser, getUserProfile, updateProfile } from "./user.controller.js";
 import { verifyUser } from "../../middlewares/auth.middleware.js";
-import { uploadAvatar } from "../../middlewares/uploadAvater.js";
+import { uploadPublic } from "../../middlewares/uploadPublic.js";
 const router = express.Router();
 router.post("/signup", signup);
 router.post("/verify-email", verifyEmail);
@@ -16,5 +16,5 @@ router.post("/reset-password", resetPassword);
 router.post("/resend-otp", resendOTP);
 // user profile routs
 router.get("/get-user-profile", verifyUser, getUserProfile);
-router.patch("/profile", verifyUser, uploadAvatar.single("avatar"), updateProfile);
+router.patch("/profile", verifyUser, uploadPublic.single("avatar"), updateProfile);
 export default router;

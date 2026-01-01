@@ -12,10 +12,10 @@ import {
     resendOTP,
     deleteUser,
     getUserProfile,
-      updateProfile
+    updateProfile
 } from "./user.controller.js";
 import { verifyUser } from "../../middlewares/auth.middleware.js";
-import { uploadAvatar } from "../../middlewares/uploadAvater.js";
+import { uploadPublic } from "../../middlewares/uploadPublic.js";
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.get("/get-user-profile",verifyUser,getUserProfile);
 router.patch(
   "/profile",
   verifyUser,
-  uploadAvatar.single("avatar"),
+  uploadPublic.single("avatar"),
   updateProfile
 );
 

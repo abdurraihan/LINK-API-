@@ -4,8 +4,8 @@ import bcryptjs from "bcrypt";
 import User from "./user.model.js";
 import { sendOTPEmail } from "../../utils/sendEmail.js";
 import { generateOTP } from "../../utils/otp.js";
-import { deleteFromS3 } from "../../utils/deleteFromS3.js";
-import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
+import { deleteFromS3ByUrl} from "../../utils/deleteFromS3.js";
+//import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
 import {
     generateTokens,
     generateAccessToken,
@@ -439,7 +439,7 @@ export const resendOTP = async (req: Request, res: Response) => {
 
 
 
-
+// get user profile 
 export const getUserProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
@@ -452,7 +452,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
     }
 
     const user = await User.findById(userId).select(
-      "username email avatarKey"
+      "username email avatar"
     );
 
     if (!user) {
@@ -462,25 +462,16 @@ export const getUserProfile = async (req: Request, res: Response) => {
       });
     }
 
-    let avatarUrl =
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
-
-    if (user.avatarKey) {
-      avatarUrl = await getSignedAvatarUrl(user.avatarKey);
-    }
-
     return res.status(200).json({
       status: "success",
       message: "User fetched successfully",
       data: {
         username: user.username,
         email: user.email,
-        avatar: avatarUrl,
+        avatar: user.avatar, 
       },
     });
-  } catch (error: any) {
-    console.error("Get profile error:", error);
-
+  } catch (error) {
     return res.status(500).json({
       status: "error",
       message: "Can't find user profile",
@@ -488,8 +479,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-
-
+// update user profile 
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
@@ -497,32 +487,37 @@ export const updateProfile = async (req: Request, res: Response) => {
     const file = req.file as any;
 
     if (!userId) {
-      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized",
+      });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ status: "fail", message: "User not found" });
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
     }
 
+    // update username
     if (username) {
       user.username = username;
     }
 
+    // update avatar
     if (file) {
-      if (user.avatarKey) {
-        await deleteFromS3(user.avatarKey);
+      // delete old avatar if it's not default
+      if (user.avatar && !user.avatar.includes("pixabay")) {
+        await deleteFromS3ByUrl(user.avatar);
       }
 
-      user.avatarKey = file.key;
+      // save public S3 URL
+      user.avatar = file.location;
     }
 
     await user.save();
-
-    let avatarUrl = user.avatar;
-    if (user.avatarKey) {
-      avatarUrl = await getSignedAvatarUrl(user.avatarKey);
-    }
 
     return res.status(200).json({
       status: "success",
@@ -530,7 +525,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       data: {
         id: user._id,
         username: user.username,
-        avatar: avatarUrl,
+        avatar: user.avatar,
       },
     });
   } catch (error: any) {

@@ -86,7 +86,7 @@ export const verifyUserOptional = async (
     
     next();
   } catch (error) {
-    
+    // Continue without authentication
     next();
   }
 };
