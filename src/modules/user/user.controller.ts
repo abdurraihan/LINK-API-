@@ -122,35 +122,35 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 //Social Login API
 export const SocialLogin = async (req: Request, res: Response, next: NextFunction) => {
-    const { name, email, photo } = req.body;
+  const { name, email, photo } = req.body;
 
-    try {
-        let user = await User.findOne({ email }).select('username email');
+  try {
+    let user = await User.findOne({ email }).select("username email");
 
-        if (!user) {
-            const generatedPassword = Math.random().toString(36).slice(-8);
-            const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
+    if (!user) {
+      const generatedPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
 
-            const newUser = new User({
-                username: name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-2),
-                email,
-                password: hashedPassword,
-                avatar: photo,
-                isVerified: true,
-            });
-        }
-
-        const { access_token, refresh_token } = generateTokens(user._id.toString());
-
-        res.status(200).json({
-            status: "success",
-            data: user,
-            access_token,
-            refresh_token,
-        });
-    } catch (error) {
-        next(error);
+      user = await User.create({
+        username: name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-2),
+        email,
+        password: hashedPassword,
+        avatar: photo,
+        isVerified: true,
+      });
     }
+
+    const { access_token, refresh_token } = generateTokens(user._id.toString());
+
+    res.status(200).json({
+      status: "success",
+      data: user,
+      access_token,
+      refresh_token,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Refresh Access Token API

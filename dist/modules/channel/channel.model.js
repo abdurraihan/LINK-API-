@@ -28,7 +28,7 @@ const channelSchema = new Schema({
     links: {
         type: String
     },
-    totalSubscribers: {
+    totalfollowers: {
         type: Number,
         default: 0,
     },

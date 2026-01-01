@@ -9,10 +9,10 @@ export interface IChannel extends Document {
   links?:string;
 
  // channel stastesitc 
-  totalSubscribers: number;
+  totalfollowers: number;
   totalViews: number;
   totalRevenue: number;
-  totalWatchTime: number; 
+  totalWatchTime: number;   
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,7 +53,7 @@ const channelSchema = new Schema<IChannel>(
         type:String
     },
 
-    totalSubscribers: {
+    totalfollowers: {
       type: Number,
       default: 0,
     },

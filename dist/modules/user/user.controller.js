@@ -92,11 +92,11 @@ export const login = async (req, res, next) => {
 export const SocialLogin = async (req, res, next) => {
     const { name, email, photo } = req.body;
     try {
-        let user = await User.findOne({ email }).select('username email');
+        let user = await User.findOne({ email }).select("username email");
         if (!user) {
             const generatedPassword = Math.random().toString(36).slice(-8);
             const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
-            const newUser = new User({
+            user = await User.create({
                 username: name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-2),
                 email,
                 password: hashedPassword,

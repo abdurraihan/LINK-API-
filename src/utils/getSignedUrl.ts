@@ -12,4 +12,4 @@ export const getSignedAvatarUrl = async (key: string) => {
     }),
     { expiresIn: 3600 } // 1 hour
   );
-};
+};                         
