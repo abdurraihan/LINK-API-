@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { createPost, getSinglePost, getAllPosts, updatePost, } from "../post/post.controller.js";
+import { createPost, getSinglePost, getAllPosts, updatePost, myPosts, deletePost } from "../post/post.controller.js";
 import { verifyUser } from "../../middlewares/auth.middleware.js";
 import { uploadPublic } from "../../middlewares/uploadPublic.js";
 const router = Router();
 router.post("/create", verifyUser, uploadPublic.array("media", 5), createPost);
+router.get("/my-posts", verifyUser, myPosts);
 router.get("/all", getAllPosts);
-router.get("/:postId", getSinglePost);
 router.put("/update/:postId", verifyUser, uploadPublic.array("media", 5), updatePost);
+router.get("/:postId", getSinglePost);
+router.delete("/:postId", verifyUser, deletePost);
 export default router;

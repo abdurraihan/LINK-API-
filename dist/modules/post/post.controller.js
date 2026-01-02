@@ -124,3 +124,70 @@ export const updatePost = async (req, res) => {
         });
     }
 };
+// Delete a post (only by owner)
+export const deletePost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Post not found",
+            });
+        }
+        // Check if the authenticated user owns this post
+        if (post.owner.toString() !== req.userId) {
+            return res.status(403).json({
+                status: "fail",
+                message: "You are not authorized to delete this post",
+            });
+        }
+        await post.deleteOne();
+        return res.status(200).json({
+            status: "success",
+            message: "Post deleted successfully",
+        });
+    }
+    catch (error) {
+        console.error("Error deleting post:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to delete post",
+        });
+    }
+};
+// Get all posts by the authenticated user
+export const myPosts = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
+        const posts = await Post.find({ owner: req.userId })
+            .populate("channel", "channelName channelIcon")
+            .populate("channel", "channelName channelIcon")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum);
+        const totalPosts = await Post.countDocuments({ owner: req.userId });
+        return res.status(200).json({
+            status: "success",
+            data: {
+                posts,
+                pagination: {
+                    currentPage: pageNum,
+                    totalPages: Math.ceil(totalPosts / limitNum),
+                    totalPosts,
+                    limit: limitNum,
+                },
+            },
+        });
+    }
+    catch (error) {
+        console.error("Error fetching user posts:", error);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to fetch your posts",
+        });
+    }
+};
