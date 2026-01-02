@@ -6,7 +6,7 @@ const userSchema = new Schema({
         trim: true,
         minlength: [2, 'Username must be at least 2 characters long'],
         maxlength: [50, 'Username cannot exceed 50 characters'],
-        match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
+        match: [/^[a-zA-Z0-9_ ]+$/, 'Username can only contain letters, numbers, underscores, and spaces']
     },
     email: {
         type: String,
