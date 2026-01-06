@@ -1,4 +1,4 @@
-// src/middleware/uploadVideoWithThumbnail.ts
+
 import multer from "multer";
 import multerS3 from "multer-s3";
 import { s3 } from "../utils/s3.js";

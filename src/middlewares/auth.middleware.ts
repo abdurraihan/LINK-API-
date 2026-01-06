@@ -89,4 +89,4 @@ export const verifyUserOptional = async (
     // Continue without authentication
     next();
   }
-};
+}; 
