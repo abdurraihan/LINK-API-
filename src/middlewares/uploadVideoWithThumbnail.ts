@@ -10,7 +10,7 @@ export const uploadVideoWithThumbnail = multer({
   storage: multerS3({
     s3,
     bucket: (req: Request, file: Express.Multer.File, cb: (error: Error | null, bucket?: string) => void) => {
-      // Choose bucket based on field name
+  
       if (file.fieldname === "video") {
         cb(null, S3_UPLOAD_BUCKET);
       } else if (file.fieldname === "thumbnail") {

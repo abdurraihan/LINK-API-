@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-const videoSchema = new Schema({
+const shortSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -11,11 +11,7 @@ const videoSchema = new Schema({
     description: {
         type: String,
         trim: true,
-        maxlength: [5000, "Description cannot exceed 5000 characters"],
-    },
-    thumbnail: {
-        type: String,
-        required: true,
+        maxlength: [500, "Description cannot exceed 500 characters"],
     },
     videoUrl: {
         type: String,
@@ -25,10 +21,6 @@ const videoSchema = new Schema({
         type: [String],
         default: [],
         index: true,
-    },
-    links: {
-        type: [String],
-        default: [],
     },
     owner: {
         type: Schema.Types.ObjectId,
@@ -78,7 +70,6 @@ const videoSchema = new Schema({
     },
     isPublished: {
         type: Boolean,
-        //default: false,
         default: true,
         index: true,
     },
@@ -91,6 +82,7 @@ const videoSchema = new Schema({
     duration: {
         type: Number,
         default: 0,
+        max: [60, "Short duration cannot exceed 60 seconds"],
     },
     category: {
         type: String,
@@ -113,10 +105,10 @@ const videoSchema = new Schema({
     timestamps: true,
     versionKey: false,
 });
-videoSchema.index({ channel: 1, publishedAt: -1 });
-videoSchema.index({ owner: 1, createdAt: -1 });
-videoSchema.index({ totalViews: -1 });
-videoSchema.index({ isPublished: 1, visibility: 1 });
-videoSchema.index({ hashtags: 1 });
-const Video = mongoose.model("Video", videoSchema);
-export default Video;
+shortSchema.index({ channel: 1, publishedAt: -1 });
+shortSchema.index({ owner: 1, createdAt: -1 });
+shortSchema.index({ totalViews: -1 });
+shortSchema.index({ isPublished: 1, visibility: 1 });
+shortSchema.index({ hashtags: 1 });
+const Short = mongoose.model("Short", shortSchema);
+export default Short;

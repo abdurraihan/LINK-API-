@@ -7,6 +7,7 @@ import userRouter from "./modules/user/user.route.js";
 import channelRouter from "./modules/channel/chennel.route.js";
 import postRouter from "./modules/post/post.router.js"
 import videoRoutes from "./modules/video/video.router.js";
+import shortsRoutes from "./modules/shorts/shorts.router.js"
 import dotenv from "dotenv";
 
 
@@ -36,6 +37,7 @@ app.use("/api/user", userRouter);
 app.use("/api/channel",channelRouter);
 app.use("/api/post",postRouter);
 app.use("/api/video", videoRoutes);
+app.use("/api/shorts/",shortsRoutes);
 
 
 

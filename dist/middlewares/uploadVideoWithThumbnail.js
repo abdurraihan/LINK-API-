@@ -1,4 +1,3 @@
-// src/middleware/uploadVideoWithThumbnail.ts
 import multer from "multer";
 import multerS3 from "multer-s3";
 import { s3 } from "../utils/s3.js";
@@ -8,7 +7,6 @@ export const uploadVideoWithThumbnail = multer({
     storage: multerS3({
         s3,
         bucket: (req, file, cb) => {
-            // Choose bucket based on field name
             if (file.fieldname === "video") {
                 cb(null, S3_UPLOAD_BUCKET);
             }

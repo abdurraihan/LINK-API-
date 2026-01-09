@@ -1,12 +1,10 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-export interface IVideo extends Document {
+export interface IShort extends Document {
   title: string;
   description?: string;
-  thumbnail: string;
   videoUrl: string;
   hashtags?: string[];
-  links?: string[];
   owner: Types.ObjectId;
   channel: Types.ObjectId;
   totalViews: number;
@@ -29,7 +27,7 @@ export interface IVideo extends Document {
   updatedAt: Date;
 }
 
-const videoSchema = new Schema<IVideo>(
+const shortSchema = new Schema<IShort>(
   {
     title: {
       type: String,
@@ -42,11 +40,7 @@ const videoSchema = new Schema<IVideo>(
     description: {
       type: String,
       trim: true,
-      maxlength: [5000, "Description cannot exceed 5000 characters"],
-    },
-    thumbnail: {
-      type: String,
-      required: true,
+      maxlength: [500, "Description cannot exceed 500 characters"],
     },
     videoUrl: {
       type: String,
@@ -56,10 +50,6 @@ const videoSchema = new Schema<IVideo>(
       type: [String],
       default: [],
       index: true,
-    },
-    links: {
-      type: [String],
-      default: [],
     },
     owner: {
       type: Schema.Types.ObjectId,
@@ -109,8 +99,7 @@ const videoSchema = new Schema<IVideo>(
     },
     isPublished: {
       type: Boolean,
-      //default: false,
-      default:true,
+      default: true,
       index: true,
     },
     visibility: {
@@ -122,6 +111,7 @@ const videoSchema = new Schema<IVideo>(
     duration: {
       type: Number,
       default: 0,
+      max: [60, "Short duration cannot exceed 60 seconds"],
     },
     category: {
       type: String,
@@ -147,12 +137,12 @@ const videoSchema = new Schema<IVideo>(
   }
 );
 
-videoSchema.index({ channel: 1, publishedAt: -1 });
-videoSchema.index({ owner: 1, createdAt: -1 });
-videoSchema.index({ totalViews: -1 });
-videoSchema.index({ isPublished: 1, visibility: 1 });
-videoSchema.index({ hashtags: 1 });
+shortSchema.index({ channel: 1, publishedAt: -1 });
+shortSchema.index({ owner: 1, createdAt: -1 });
+shortSchema.index({ totalViews: -1 });
+shortSchema.index({ isPublished: 1, visibility: 1 });
+shortSchema.index({ hashtags: 1 });
 
-const Video: Model<IVideo> = mongoose.model<IVideo>("Video", videoSchema);
+const Short: Model<IShort> = mongoose.model<IShort>("Short", shortSchema);
 
-export default Video;
+export default Short;
