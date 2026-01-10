@@ -9,7 +9,7 @@ import postRouter from "./modules/post/post.router.js"
 import videoRoutes from "./modules/video/video.router.js";
 import shortsRoutes from "./modules/shorts/shorts.router.js"
 import reactRoutes from "./modules/react/react.router.js";
-//import commentRoutes from "./routes/comment.routes.js";
+import commentRoutes from "./modules/comment/comment.router.js";
 //import commentReactRoutes from "./routes/commentReact.routes.js";
 import dotenv from "dotenv";
 
@@ -42,7 +42,7 @@ app.use("/api/post",postRouter);
 app.use("/api/video", videoRoutes);
 app.use("/api/shorts/",shortsRoutes);
 app.use("/api/v1/reactions", reactRoutes);
-//app.use("/api/v1/comments", commentRoutes);
+app.use("/api/v1/comments", commentRoutes);
 //app.use("/api/v1/comment-reactions", commentReactRoutes);
 
 
