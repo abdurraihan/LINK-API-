@@ -1,40 +1,35 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-export type ReactionType = "like" | "dislike";
-export type TargetType = "Post" | "Short";
-
-export interface IReaction extends Document {
-  targetId: Types.ObjectId;
-  targetType: TargetType;
-
+export interface IReact extends Document {
   user: Types.ObjectId;
-  type: ReactionType;
-
+  targetType: "Video" | "Short" | "Post";
+  targetId: Types.ObjectId;
+  reactionType: "like" | "dislike";
   createdAt: Date;
+  updatedAt: Date;
 }
 
-const reactionSchema = new Schema<IReaction>(
+const reactSchema = new Schema<IReact>(
   {
-    targetId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      index: true,
-    },
-
-    targetType: {
-      type: String,
-      enum: ["Post", "Short"],
-      required: true,
-      index: true,
-    },
-
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
-
-    type: {
+    targetType: {
+      type: String,
+      enum: ["Video", "Short", "Post"],
+      required: true,
+      index: true,
+    },
+    targetId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: "targetType",
+      index: true,
+    },
+    reactionType: {
       type: String,
       enum: ["like", "dislike"],
       required: true,
@@ -46,13 +41,12 @@ const reactionSchema = new Schema<IReaction>(
   }
 );
 
-// One reaction per user per target
-reactionSchema.index(
-  { targetId: 1, targetType: 1, user: 1 },
-  { unique: true }
-);
+// Compound index to ensure one reaction per user per target
+reactSchema.index({ user: 1, targetType: 1, targetId: 1 }, { unique: true });
 
-const Reaction: Model<IReaction> =
-  mongoose.model<IReaction>("Reaction", reactionSchema);
+// Index for querying reactions by target
+reactSchema.index({ targetType: 1, targetId: 1, reactionType: 1 });
 
-export default Reaction;
+const React: Model<IReact> = mongoose.model<IReact>("React", reactSchema);
+
+export default React;
