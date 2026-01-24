@@ -34,10 +34,9 @@ const commentReactSchema = new Schema<ICommentReact>(
   }
 );
 
-// Compound index to ensure one reaction per user per comment
 commentReactSchema.index({ user: 1, comment: 1 }, { unique: true });
 
-// Index for querying reactions by comment
+
 commentReactSchema.index({ comment: 1, reactionType: 1 });
 
 const CommentReact: Model<ICommentReact> = mongoose.model<ICommentReact>(

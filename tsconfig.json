@@ -11,3 +11,23 @@
     "skipLibCheck": true
   }
 }
+
+// // for render 
+// {
+//   "compilerOptions": {
+//     "target": "ES2020",
+//     "module": "NodeNext",
+//     "moduleResolution": "NodeNext",
+//     "outDir": "dist",
+//     "rootDir": "src",
+//     "strict": false,
+//     "esModuleInterop": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "skipLibCheck": true,
+//     "resolveJsonModule": true,  // Add this - allows importing JSON files
+//     "sourceMap": true,           // Add this - helps with debugging in production
+//     "declaration": false         // Add this - faster builds (no .d.ts files)
+//   },
+//   "include": ["src/**/*"],      // Add this - explicitly include source files
+//   "exclude": ["node_modules", "dist"]  // Add this - exclude unnecessary directories
+// }
