@@ -11,6 +11,7 @@ import shortsRoutes from "./modules/shorts/shorts.router.js"
 import reactRoutes from "./modules/react/react.router.js";
 import commentRoutes from "./modules/comment/comment.router.js";
 import commentReactRoutes from "./modules/commentReact/commentReact.router.js";
+import followRoutes from "./modules/follow/follow.router.js"
 import dotenv from "dotenv";
 
 
@@ -44,6 +45,7 @@ app.use("/api/shorts/",shortsRoutes);
 app.use("/api/v1/reactions", reactRoutes);
 app.use("/api/v1/comments", commentRoutes);
 app.use("/api/v1/comment-reactions", commentReactRoutes);
+app.use("/api/v1/follows",followRoutes)
 
 
 
