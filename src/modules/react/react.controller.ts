@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import React from "../react/react.model.js";
 import Video from "../video/video.model.js";
-import Short from "../shorts/shorts.router.js";
+import Short from "../shorts/shorts.model.js";
 import Post from "../post/post.model.js";
+import notificationService from "../notification/notification.service.js";
 import mongoose from "mongoose";
 
 // Toggle reaction (like/dislike) on video, short, or post
@@ -135,6 +136,8 @@ export const toggleReaction = async (req: Request, res: Response) => {
       });
     }
 
+
+    
     res.status(201).json({
       status: "success",
       message: "Reaction added",

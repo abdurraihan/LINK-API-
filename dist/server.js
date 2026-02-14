@@ -20,7 +20,6 @@ const connectDB = async () => {
 // Start server
 const startServer = async () => {
     await connectDB();
-    // ✅ Initialize Firebase here
     initializeFirebase();
     server.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);

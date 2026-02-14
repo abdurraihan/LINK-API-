@@ -1,6 +1,6 @@
 import React from "../react/react.model.js";
 import Video from "../video/video.model.js";
-import Short from "../shorts/shorts.router.js";
+import Short from "../shorts/shorts.model.js";
 import Post from "../post/post.model.js";
 import mongoose from "mongoose";
 // Toggle reaction (like/dislike) on video, short, or post

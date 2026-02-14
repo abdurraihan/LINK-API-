@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Video from "../../modules/video/video.model.js";
 import Channel from "../../modules/channel/channel.model.js";
 import { createTranscodeJob, getJobStatus } from "../../services/mediaConvert.service.js";
+import notificationService from "../notification/notification.service.js";
 
 import { S3_OUTPUT_BUCKET } from "../../config/config.js";
 import mongoose from "mongoose";
@@ -93,6 +94,11 @@ export const createVideo = async (req: Request, res: Response) => {
       transcodeJobId: transcodeJob.jobId,
       transcodeStatus: "PROGRESSING",
     });
+
+    //sending notificatin to the follower of the channel 
+     notificationService
+      .notifyNewVideo(video._id, channelId, video.title, video.thumbnail)
+      .catch((err) => console.error("Notification error:", err));
 
     return res.status(201).json({
       status: "success",

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Follow from "./follow.model.js";
 import Channel from "../channel/channel.model.js";
 import User from "../user/user.model.js";
+import notificationService from "../notification/notification.service.js";
 import mongoose from "mongoose";
 
 
@@ -168,6 +169,22 @@ export const followChannel = async (req: Request, res: Response) => {
     await Channel.findByIdAndUpdate(channelId, {
       $inc: { totalfollowers: 1 },
     });
+
+     // Get follower username (needed for notification title)
+    const follower = await User.findById(userId).select("username");
+    const followerUsername = follower?.username || "Someone";
+
+    // NOTIFY CHANNEL OWNER 
+    notificationService
+      .notifyNewFollower(
+        channel.owner,      // channelOwnerId 
+        userId,             // followerId 
+        followerUsername,   // followerUsername 
+        channel._id,        // channelId 
+        channel.channelName // channelName 
+      )
+      .catch((err: any) => console.error("Notification error:", err));
+
 
     return res.status(201).json({
       status: "success",
