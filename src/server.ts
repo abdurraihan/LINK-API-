@@ -39,7 +39,7 @@ const startServer = async () => {
 
   await connectDB();
 
-  // ✅ Initialize Firebase here
+  
   initializeFirebase();
 
   server.listen(PORT, () => {
