@@ -9,6 +9,7 @@ import { generateTokens, generateAccessToken, verifyRefreshToken } from "../../u
 // Signup API with Email Verification
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
+    console.log();
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {

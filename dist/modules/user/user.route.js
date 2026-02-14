@@ -3,6 +3,7 @@ import { signup, verifyEmail, login, SocialLogin, refreshAccessToken, changePass
 import { verifyUser } from "../../middlewares/auth.middleware.js";
 import { uploadPublic } from "../../middlewares/uploadPublic.js";
 const router = express.Router();
+// auth routes 
 router.post("/signup", signup);
 router.post("/verify-email", verifyEmail);
 router.post("/login", login);

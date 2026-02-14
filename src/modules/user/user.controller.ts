@@ -19,7 +19,7 @@ import {
 // Signup API with Email Verification
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
-
+console.log()
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -31,7 +31,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
         const otp = generateOTP();
 
-
         const newUser = new User({
             username,
             email,
@@ -41,7 +40,8 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
         await newUser.save();
 
-        await sendOTPEmail(email, otp);
+       
+     await sendOTPEmail(email, otp);
 
         res.status(201).json({
             message: "User created. Please verify your email with the OTP."

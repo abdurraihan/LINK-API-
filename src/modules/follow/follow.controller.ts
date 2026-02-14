@@ -197,7 +197,7 @@ export const followChannel = async (req: Request, res: Response) => {
   }
 };
 
-
+// for user 
 export const getMyFollowedChannels = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
@@ -275,6 +275,112 @@ export const getMyFollowedChannels = async (req: Request, res: Response) => {
   }
 };
 
+
+// Get channels the user is NOT following (for discovery/recommendations)
+export const getUnfollowedChannels = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+    const { page = 1, limit = 20, sortBy = "totalfollowers" } = req.query;
+
+    if (!userId) {
+      return res.status(401).json({
+        status: "fail",
+        message: "User not authenticated",
+      });
+    }
+
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get all channel IDs that the user is already following
+    const followedChannelIds = await Follow.find({ follower: userId })
+      .distinct("channel");
+
+    // Get all channels owned by the user
+    const userOwnedChannels = await Channel.find({ owner: userId })
+      .distinct("_id");
+
+    // Combine followed channels and user's own channels to exclude
+    const excludedChannelIds = [
+      ...followedChannelIds,
+      ...userOwnedChannels,
+    ];
+
+    // Build sort object
+    let sortObject: any = {};
+    if (sortBy === "totalfollowers") {
+      sortObject = { totalfollowers: -1 };
+    } else if (sortBy === "totalViews") {
+      sortObject = { totalViews: -1 };
+    } else if (sortBy === "createdAt") {
+      sortObject = { createdAt: -1 };
+    } else {
+      sortObject = { totalfollowers: -1 }; // default
+    }
+
+    // Find channels that user is NOT following and doesn't own
+    const unfollowedChannels = await Channel.find({
+      _id: { $nin: excludedChannelIds },
+      owner: { $ne: null }, // Ensure owner exists
+    })
+      .sort(sortObject)
+      .skip(skip)
+      .limit(limitNum)
+      .populate({
+        path: "owner",
+        select: "username avatar email",
+      })
+      .select("channelName channelIcon description totalfollowers totalViews createdAt owner")
+      .lean();
+
+    // Get total count for pagination
+    const totalUnfollowedChannels = await Channel.countDocuments({
+      _id: { $nin: excludedChannelIds },
+      owner: { $ne: null },
+    });
+
+    // Format the response with null safety
+    const formattedChannels = unfollowedChannels
+      .filter((channel: any) => channel.owner) // Filter out channels with null owners
+      .map((channel: any) => ({
+        _id: channel._id,
+        channelName: channel.channelName || "Unknown Channel",
+        channelIcon: channel.channelIcon || null,
+        description: channel.description || "",
+        totalfollowers: channel.totalfollowers || 0,
+        totalViews: channel.totalViews || 0,
+        createdAt: channel.createdAt,
+        owner: {
+          _id: channel.owner._id,
+          username: channel.owner.username || "Unknown User",
+          avatar: channel.owner.avatar || null,
+        },
+      }));
+
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully retrieved unfollowed channels",
+      data: {
+        channels: formattedChannels,
+        pagination: {
+          currentPage: pageNum,
+          totalPages: Math.ceil(totalUnfollowedChannels / limitNum),
+          totalChannels: totalUnfollowedChannels,
+          hasNextPage: pageNum * limitNum < totalUnfollowedChannels,
+          hasPrevPage: pageNum > 1,
+        },
+      },
+    });
+  } catch (error: any) {
+    console.error("Get unfollowed channels error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error while fetching unfollowed channels",
+      error: error.message,
+    });
+  }
+};
 
 export const checkFollowStatus = async (req: Request, res: Response) => {
   try {
@@ -371,7 +477,7 @@ export const toggleNotifications = async (req: Request, res: Response) => {
   }
 };
 
-
+// for channel 
 export const getChannelFollowers = async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
