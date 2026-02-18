@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 
 class NotificationService {
   /**
-   * Notify followers about new video upload
+   * Notify followers about new video upload done int
    */
   async notifyNewVideo(
     videoId: string | Types.ObjectId,
@@ -100,7 +100,7 @@ class NotificationService {
   }
 
   /**
-   * Notify user about new comment on their content
+   * Notify user about new comment on their content done int
    */
   async notifyNewComment(
     commentId: string | Types.ObjectId,
@@ -140,7 +140,7 @@ class NotificationService {
   }
 
   /**
-   * Notify user about reply to their comment
+   * Notify user about reply to their comment done int
    */
   async notifyCommentReply(
     replyId: string | Types.ObjectId,
@@ -180,7 +180,7 @@ class NotificationService {
   }
 
   /**
-   * Notify user about new follower
+   * Notify user about new follower done int
    */
   async notifyNewFollower(
     channelOwnerId: string | Types.ObjectId,
@@ -212,7 +212,7 @@ class NotificationService {
   }
 
   /**
-   * Notify user about like on their content
+   * Notify user about like on their content (this is fore comment like )
    */
   async notifyLike(
     contentOwnerId: string | Types.ObjectId,
