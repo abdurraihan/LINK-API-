@@ -16,6 +16,7 @@ import commentRoutes from "./modules/comment/comment.router.js";
 import commentReactRoutes from "./modules/commentReact/commentReact.router.js";
 import followRoutes from "./modules/follow/follow.router.js";
 import notificationRoutes from "./modules/notification/notification.router.js";
+import searchRoutes from "./modules/Search/searchRoutes.js"
 
 import { socketService } from "./utils/socket.utils.js";
 
@@ -61,6 +62,7 @@ app.use("/api/v1/comments", commentRoutes);
 app.use("/api/v1/comment-reactions", commentReactRoutes);
 app.use("/api/v1/follows", followRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/search",searchRoutes)
 
 
 // Error handlers

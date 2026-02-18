@@ -86,5 +86,7 @@ const postSchema = new Schema<IPost>(
   }
 );
 
+postSchema.index({ description: 'text', hashtags: 'text' });
+
 const Post: Model<IPost> = mongoose.model<IPost>("Post", postSchema);
 export default Post;

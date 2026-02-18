@@ -142,7 +142,7 @@ shortSchema.index({ owner: 1, createdAt: -1 });
 shortSchema.index({ totalViews: -1 });
 shortSchema.index({ isPublished: 1, visibility: 1 });
 shortSchema.index({ hashtags: 1 });
-
+shortSchema.index({ title: 'text', description: 'text', hashtags: 'text' });
 const Short: Model<IShort> = mongoose.model<IShort>("Short", shortSchema);
 
 export default Short;

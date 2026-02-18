@@ -4,7 +4,7 @@ import Follow from "../follow/follow.model.js";
 import Channel from "../channel/channel.model.js";
 class NotificationService {
     /**
-     * Notify followers about new video upload
+     * Notify followers about new video upload done int
      */
     async notifyNewVideo(videoId, channelId, videoTitle, thumbnailUrl) {
         try {
@@ -81,7 +81,7 @@ class NotificationService {
         }
     }
     /**
-     * Notify user about new comment on their content
+     * Notify user about new comment on their content done int
      */
     async notifyNewComment(commentId, contentOwnerId, commenterId, commenterUsername, commentText, targetType, targetId) {
         try {
@@ -112,7 +112,7 @@ class NotificationService {
         }
     }
     /**
-     * Notify user about reply to their comment
+     * Notify user about reply to their comment done int
      */
     async notifyCommentReply(replyId, originalCommentOwnerId, replierId, replierUsername, replyText, targetType, targetId) {
         try {
@@ -143,7 +143,7 @@ class NotificationService {
         }
     }
     /**
-     * Notify user about new follower
+     * Notify user about new follower done int
      */
     async notifyNewFollower(channelOwnerId, followerId, followerUsername, channelId, channelName) {
         try {
@@ -168,7 +168,7 @@ class NotificationService {
         }
     }
     /**
-     * Notify user about like on their content
+     * Notify user about like on their content (this is fore comment like )
      */
     async notifyLike(contentOwnerId, likerId, likerUsername, targetType, targetId) {
         try {
