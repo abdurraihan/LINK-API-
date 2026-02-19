@@ -153,7 +153,7 @@ videoSchema.index({ totalViews: -1 });
 videoSchema.index({ isPublished: 1, visibility: 1 });
 videoSchema.index({ hashtags: 1 });
 
-videoSchema.index({ title: 'text', description: 'text', hashtags: 'text' });
+videoSchema.index({ title: 'text', description: 'text', hashtags: 'text' });                      
 const Video: Model<IVideo> = mongoose.model<IVideo>("Video", videoSchema);
 
 export default Video;
