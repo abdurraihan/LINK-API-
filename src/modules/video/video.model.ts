@@ -55,7 +55,7 @@ const videoSchema = new Schema<IVideo>(
     hashtags: {
       type: [String],
       default: [],
-      index: true,
+      //index: true,
     },
     links: {
       type: [String],

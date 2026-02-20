@@ -17,9 +17,10 @@ import {
 
 
 // Signup API with Email Verification
+
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
-console.log()
+
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -27,8 +28,6 @@ console.log()
         }
 
         const hashedPassword = await bcryptjs.hash(password, 10);
-
-
         const otp = generateOTP();
 
         const newUser = new User({
@@ -40,8 +39,13 @@ console.log()
 
         await newUser.save();
 
-       
-     await sendOTPEmail(email, otp);
+        try {
+            await sendOTPEmail(email, otp);
+        } catch (emailError) {
+           
+            await User.deleteOne({ _id: newUser._id });
+            return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+        }
 
         res.status(201).json({
             message: "User created. Please verify your email with the OTP."
@@ -50,6 +54,7 @@ console.log()
         next(error);
     }
 };
+
 
 // Verify Email API with OTP
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {

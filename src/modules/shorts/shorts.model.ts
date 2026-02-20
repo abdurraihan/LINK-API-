@@ -49,7 +49,7 @@ const shortSchema = new Schema<IShort>(
     hashtags: {
       type: [String],
       default: [],
-      index: true,
+      //index: true,
     },
     owner: {
       type: Schema.Types.ObjectId,
