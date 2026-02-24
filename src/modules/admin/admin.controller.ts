@@ -145,7 +145,11 @@ export const adminForgotPassword = async (req: Request, res: Response) => {
     admin.otp = otp;
     await admin.save();
 
-    await sendOTPEmail(email, otp);
+   try {
+     await sendOTPEmail(email, otp);
+   } catch (error) {
+    res.status(400).json({message:"otp is not sent somting went wrong "})
+   }
 
     res.status(200).json({ message: "OTP sent to email" });
   } catch (error) {

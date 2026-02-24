@@ -1,6 +1,7 @@
 import express from "express";
 import { createAdmin, adminLogin, updateAdminProfile, adminForgotPassword, adminVerifyOTP, adminResetPassword, adminLogout } from "./admin.controller.js";
 import { verifyAdmin } from "../../middlewares/auth.middleware.js"
+import { uploadPublic } from "../../middlewares/uploadPublic.js"
 
 const router = express.Router();
 
@@ -14,7 +15,12 @@ router.post("/login", adminLogin);
 router.post("/logout", verifyAdmin, adminLogout);
 
 // Admin Profile Update Route (protected with verifyAdmin)
-router.put("/update-profile", verifyAdmin, updateAdminProfile);
+router.put(
+  "/update-profile",
+  verifyAdmin,
+  uploadPublic.single("avatar"),  
+  updateAdminProfile
+);
 
 // Admin Forgot Password Route
 router.post("/forgot-password", adminForgotPassword);
