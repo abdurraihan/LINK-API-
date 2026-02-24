@@ -89,6 +89,40 @@ export const adminLogout = async (req: Request, res: Response) => {
   }
 };
 
+// GET ADMIN PROFILE
+export const getAdminProfile = async (req: Request, res: Response) => {
+  try {
+    const adminId = req.adminId;
+
+    if (!adminId) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized",
+      });
+    }
+
+    const admin = await Admin.findById(adminId).select("-password -otp");
+
+    if (!admin) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Admin not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      admin,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch admin profile",
+    });
+  }
+};
+
+
 // Admin Profile Update
 export const updateAdminProfile = async (req: Request, res: Response) => {
   const adminId = req.adminId;

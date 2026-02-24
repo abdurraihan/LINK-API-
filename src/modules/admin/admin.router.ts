@@ -1,5 +1,5 @@
 import express from "express";
-import { createAdmin, adminLogin, updateAdminProfile, adminForgotPassword, adminVerifyOTP, adminResetPassword, adminLogout } from "./admin.controller.js";
+import { createAdmin, adminLogin, updateAdminProfile, adminForgotPassword, adminVerifyOTP, adminResetPassword, adminLogout , getAdminProfile } from "./admin.controller.js";
 import { verifyAdmin } from "../../middlewares/auth.middleware.js"
 import { uploadPublic } from "../../middlewares/uploadPublic.js"
 
@@ -14,6 +14,8 @@ router.post("/login", adminLogin);
 // Admin Logout Route
 router.post("/logout", verifyAdmin, adminLogout);
 
+// GET PROFILE
+router.get("/profile", verifyAdmin, getAdminProfile);
 // Admin Profile Update Route (protected with verifyAdmin)
 router.put(
   "/update-profile",
