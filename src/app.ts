@@ -22,7 +22,7 @@ import historyRouter from "./modules/history/history.router.js"
 import adminRouter from "./modules/admin/admin.router.js"
 import reportRouter from "./modules/report/report.router.js"
 import settingRouter from "./modules/setting/setting.router.js"
-
+import bannerRoutes from "./modules/Banner/bannar.router.js";
 import { socketService } from "./utils/socket.utils.js";
 
 dotenv.config();
@@ -73,8 +73,7 @@ app.use("/api/v1/history",historyRouter)
 app.use("/api/v1/admin",adminRouter)
 app.use("/api/v1/report",reportRouter)
 app.use("/api/v1/setting",settingRouter)
-
-
+app.use("/api/banners", bannerRoutes);
 
 // Error handlers
 app.use(globalErrorHandler);
