@@ -24,6 +24,7 @@ import reportRouter from "./modules/report/report.router.js"
 import settingRouter from "./modules/setting/setting.router.js"
 import bannerRoutes from "./modules/Banner/bannar.router.js";
 import userManagementRoutes from "./modules/userManagement/userManagement.router.js";
+import mangeContentRoutes from "./modules/manageContent/manageContent.router.js"
 import { socketService } from "./utils/socket.utils.js";
 
 dotenv.config();
@@ -76,6 +77,8 @@ app.use("/api/v1/report", reportRouter)
 app.use("/api/v1/setting", settingRouter)
 app.use("/api/v1/banners", bannerRoutes);
 app.use("/api/v1/user-management", userManagementRoutes);
+app.use("/api/v1/manage-contents",mangeContentRoutes)
+
 
 // Error handlers
 app.use(globalErrorHandler);
