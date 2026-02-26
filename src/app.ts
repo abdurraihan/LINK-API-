@@ -1,5 +1,5 @@
 import cors from "cors";
-import http from "http"; 
+import http from "http";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 
@@ -23,6 +23,7 @@ import adminRouter from "./modules/admin/admin.router.js"
 import reportRouter from "./modules/report/report.router.js"
 import settingRouter from "./modules/setting/setting.router.js"
 import bannerRoutes from "./modules/Banner/bannar.router.js";
+import userManagementRoutes from "./modules/userManagement/userManagement.router.js";
 import { socketService } from "./utils/socket.utils.js";
 
 dotenv.config();
@@ -67,13 +68,14 @@ app.use("/api/v1/comments", commentRoutes);
 app.use("/api/v1/comment-reactions", commentReactRoutes);
 app.use("/api/v1/follows", followRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
-app.use("/api/v1/search",searchRoutes)
-app.use("/api/v1/save",saveRouter)
-app.use("/api/v1/history",historyRouter)
-app.use("/api/v1/admin",adminRouter)
-app.use("/api/v1/report",reportRouter)
-app.use("/api/v1/setting",settingRouter)
-app.use("/api/banners", bannerRoutes);
+app.use("/api/v1/search", searchRoutes)
+app.use("/api/v1/save", saveRouter)
+app.use("/api/v1/history", historyRouter)
+app.use("/api/v1/admin", adminRouter)
+app.use("/api/v1/report", reportRouter)
+app.use("/api/v1/setting", settingRouter)
+app.use("/api/v1/banners", bannerRoutes);
+app.use("/api/v1/user-management", userManagementRoutes);
 
 // Error handlers
 app.use(globalErrorHandler);
