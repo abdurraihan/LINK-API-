@@ -217,3 +217,58 @@ export const getReactionStats = async (req: Request, res: Response) => {
     });
   }
 };
+
+// for checking user is already reacted or not the content 
+export const getMyReactionStatus = async (req: Request, res: Response) => {
+  try {
+    const { targetType, targetId } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        status: "fail",
+        message: "User not authenticated",
+      });
+    }
+
+    if (!["Video", "Short", "Post"].includes(targetType)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid target type",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(targetId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid target ID",
+      });
+    }
+
+    const reaction = await React.findOne({
+      user: userId,
+      targetType,
+      targetId,
+    })
+      .select("reactionType")
+      .lean();
+
+    return res.status(200).json({
+      status: "success",
+      data: {
+        hasReacted: !!reaction,
+        reactionType: reaction?.reactionType || null, 
+        isLiked: reaction?.reactionType === "like",
+        isDisliked: reaction?.reactionType === "dislike",
+      },
+    });
+  } catch (error: any) {
+    console.error("Get my reaction status error:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Server error while checking reaction status",
+      error: error.message,
+    });
+  }
+};

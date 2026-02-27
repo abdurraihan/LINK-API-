@@ -249,24 +249,47 @@ export const getMyFollowedChannels = async (req: Request, res: Response) => {
     // Get total count for pagination
     const totalFollows = await Follow.countDocuments({ follower: userId });
 
+
+    const followedChannels = follows
+  .filter((follow: any) => follow.channel) // remove broken references
+  .map((follow: any) => ({
+    followId: follow._id,
+    followedAt: follow.createdAt,
+    notificationsEnabled: follow.notificationsEnabled,
+    channel: {
+      _id: follow.channel._id,
+      channelName: follow.channel.channelName,
+      channelIcon: follow.channel.channelIcon,
+      description: follow.channel.description,
+      totalfollowers: follow.channel.totalfollowers,
+      totalViews: follow.channel.totalViews,
+      owner: follow.channel.owner
+        ? {
+            _id: follow.channel.owner._id,
+            username: follow.channel.owner.username,
+          }
+        : null,
+    },
+  }));
+
     // Format the response
-    const followedChannels = follows.map((follow: any) => ({
-      followId: follow._id,
-      followedAt: follow.createdAt,
-      notificationsEnabled: follow.notificationsEnabled,
-      channel: {
-        _id: follow.channel._id,
-        channelName: follow.channel.channelName,
-        channelIcon: follow.channel.channelIcon,
-        description: follow.channel.description,
-        totalfollowers: follow.channel.totalfollowers,
-        totalViews: follow.channel.totalViews,
-        owner: {
-          _id: follow.channel.owner._id,
-          username: follow.channel.owner.username,
-        },
-      },
-    }));
+    // const followedChannels = follows.map((follow: any) => ({
+    //   followId: follow._id,
+    //   followedAt: follow.createdAt,
+    //   notificationsEnabled: follow.notificationsEnabled,
+    //   channel: {
+    //     _id: follow.channel._id,
+    //     channelName: follow.channel.channelName,
+    //     channelIcon: follow.channel.channelIcon,
+    //     description: follow.channel.description,
+    //     totalfollowers: follow.channel.totalfollowers,
+    //     totalViews: follow.channel.totalViews,
+    //     owner: {
+    //       _id: follow.channel.owner._id,
+    //       username: follow.channel.owner.username,
+    //     },
+    //   },
+    // }));
 
     return res.status(200).json({
       status: "success",
