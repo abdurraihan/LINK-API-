@@ -15,7 +15,7 @@ import reactRoutes from "./modules/react/react.router.js";
 import commentRoutes from "./modules/comment/comment.router.js";
 import commentReactRoutes from "./modules/commentReact/commentReact.router.js";
 import followRoutes from "./modules/follow/follow.router.js";
-import notificationRoutes from "./modules/notification/notification.router.js";
+import notificationRoutes from "./modules/userNotification/userNotification.router.js";
 import searchRoutes from "./modules/Search/searchRoutes.js"
 import saveRouter from "./modules/save/save.router.js";
 import historyRouter from "./modules/history/history.router.js"
@@ -25,6 +25,7 @@ import settingRouter from "./modules/setting/setting.router.js"
 import bannerRoutes from "./modules/Banner/bannar.router.js";
 import userManagementRoutes from "./modules/userManagement/userManagement.router.js";
 import mangeContentRoutes from "./modules/manageContent/manageContent.router.js"
+import adminNotificationRoutes from "./modules/adminNotification/adminNotification.routes.js";
 import { socketService } from "./utils/socket.utils.js";
 
 dotenv.config();
@@ -77,7 +78,8 @@ app.use("/api/v1/report", reportRouter)
 app.use("/api/v1/setting", settingRouter)
 app.use("/api/v1/banners", bannerRoutes);
 app.use("/api/v1/user-management", userManagementRoutes);
-app.use("/api/v1/manage-contents",mangeContentRoutes)
+app.use("/api/v1/manage-contents",mangeContentRoutes);
+app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 
 
 // Error handlers

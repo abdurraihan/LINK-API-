@@ -3,12 +3,20 @@ import Report from "./report.model.js";
 import Video from "../video/video.model.js";
 import Short from "../shorts/shorts.model.js";
 import Post from "../post/post.model.js";
-
+import User from "../user/user.model.js";
+import { notifyAdminNewReport } from "../../utils/adminNotification.utils.js";
 
 // USER CREATE REPORT
 export const createReport = async (req: Request, res: Response) => {
   try {
     const { contentId, contentType, reason, description } = req.body;
+    const userID = req.userId!
+
+    if (!userID) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+
+    }
+    const currentUser = await User.findById(userID).select("username").lean();
 
     const report = await Report.create({
       reporter: req.userId,
@@ -18,11 +26,21 @@ export const createReport = async (req: Request, res: Response) => {
       description,
     });
 
+    notifyAdminNewReport({
+      reporterId: userID!,
+      reporterUsername: currentUser.username,
+      reason: req.body.reason,
+      targetType: req.body.targetType,  // "Video" | "Short" | "Post" | "Channel" | "User"
+      targetId: req.body.targetId,
+    });
+
     res.status(201).json({
       status: "success",
       message: "Report submitted successfully",
       report,
     });
+
+
   } catch (error) {
     res.status(500).json({ message: "Failed to create report" });
   }

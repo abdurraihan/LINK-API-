@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Follow from "./follow.model.js";
 import Channel from "../channel/channel.model.js";
 import User from "../user/user.model.js";
-import notificationService from "../notification/notification.service.js";
+import notificationService from "../userNotification/userNotification.service.js";
 import mongoose from "mongoose";
 
 

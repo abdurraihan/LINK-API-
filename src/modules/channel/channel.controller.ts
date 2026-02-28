@@ -1,23 +1,34 @@
 import { Request, Response } from "express";
-import Channel  from "../channel/channel.model.js";
+import User from "../user/user.model.js";
+import Channel from "../channel/channel.model.js";
 import { deleteFromS3ByUrl } from "../../utils/deleteFromS3.js";
+import { notifyAdminNewChannel } from "../../utils/adminNotification.utils.js";
 
 // CREATE CHANNEL
 export const createChannel = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
+
+    const user = await User.findById(userId)
+      .select("username")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "User not found" });
+    }
+
+    const currentUserName = user.username;
+
     const { channelName, description, links } = req.body;
     const file = req.file as any;
 
-    if (!userId) {
-      return res.status(401).json({ status: "fail", message: "Unauthorized" });
-    }
+   
 
     if (!file) {
       return res.status(400).json({ status: "fail", message: "Channel icon is required" });
     }
 
-    
+
     const existingChannel = await Channel.findOne({ owner: userId });
     if (existingChannel) {
       return res.status(400).json({ status: "fail", message: "User already has a channel" });
@@ -29,6 +40,15 @@ export const createChannel = async (req: Request, res: Response) => {
       links,
       channelIcon: file.location,
       owner: userId,
+    });
+
+    // sending notification to admin A new channel has been created 
+    notifyAdminNewChannel({
+      id: channel._id.toString(),
+      channelName: channel.channelName,
+      channelIcon: channel.channelIcon,
+      ownerId: req.userId!,
+      ownerUsername: currentUserName,
     });
 
     res.status(201).json({ status: "success", data: channel });
@@ -43,7 +63,7 @@ export const updateMyChannel = async (req: Request, res: Response) => {
     const userId = req.userId;
     const { channelName, description, links } = req.body;
 
-    
+
     const file = req.file as Express.MulterS3.File | undefined;
 
     if (!userId) {
@@ -57,7 +77,7 @@ export const updateMyChannel = async (req: Request, res: Response) => {
 
     if (file && channel.channelIcon) {
       await deleteFromS3ByUrl(channel.channelIcon);
-      channel.channelIcon = file.location; 
+      channel.channelIcon = file.location;
     }
 
     if (channelName) channel.channelName = channelName;
@@ -70,7 +90,7 @@ export const updateMyChannel = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ status: "error", message: error.message });
   }
-};       
+};
 
 // GET CHANNEL
 export const getMyChannel = async (req: Request, res: Response) => {
@@ -81,7 +101,7 @@ export const getMyChannel = async (req: Request, res: Response) => {
       return res.status(401).json({ status: "fail", message: "Unauthorized" });
     }
 
-  
+
     const channel = await Channel.findOne({ owner: userId }).populate("owner", "username email");
 
     if (!channel) {

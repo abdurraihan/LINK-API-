@@ -4,7 +4,8 @@ import bcryptjs from "bcrypt";
 import User from "./user.model.js";
 import { sendOTPEmail } from "../../utils/sendEmail.js";
 import { generateOTP } from "../../utils/otp.js";
-import { deleteFromS3ByUrl} from "../../utils/deleteFromS3.js";
+import { deleteFromS3ByUrl } from "../../utils/deleteFromS3.js";
+import { notifyAdminNewUser } from "../../utils/adminNotification.utils.js";
 //import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
 import {
     generateTokens,
@@ -41,8 +42,14 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
         try {
             await sendOTPEmail(email, otp);
+            notifyAdminNewUser({
+                id: newUser._id.toString(),
+                username: newUser.username,
+                email: newUser.email,
+                avatar: newUser.avatar,
+            });
         } catch (emailError) {
-           
+
             await User.deleteOne({ _id: newUser._id });
             return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
         }
@@ -127,35 +134,35 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 //Social Login API
 export const SocialLogin = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, photo } = req.body;
+    const { name, email, photo } = req.body;
 
-  try {
-    let user = await User.findOne({ email }).select("username email");
+    try {
+        let user = await User.findOne({ email }).select("username email");
 
-    if (!user) {
-      const generatedPassword = Math.random().toString(36).slice(-8);
-      const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
+        if (!user) {
+            const generatedPassword = Math.random().toString(36).slice(-8);
+            const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
 
-      user = await User.create({
-        username: name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-2),
-        email,
-        password: hashedPassword,
-        avatar: photo,
-        isVerified: true,
-      });
+            user = await User.create({
+                username: name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-2),
+                email,
+                password: hashedPassword,
+                avatar: photo,
+                isVerified: true,
+            });
+        }
+
+        const { access_token, refresh_token } = generateTokens(user._id.toString());
+
+        res.status(200).json({
+            status: "success",
+            data: user,
+            access_token,
+            refresh_token,
+        });
+    } catch (error) {
+        next(error);
     }
-
-    const { access_token, refresh_token } = generateTokens(user._id.toString());
-
-    res.status(200).json({
-      status: "success",
-      data: user,
-      access_token,
-      refresh_token,
-    });
-  } catch (error) {
-    next(error);
-  }
 };
 
 // Refresh Access Token API
@@ -446,97 +453,97 @@ export const resendOTP = async (req: Request, res: Response) => {
 
 // get user profile 
 export const getUserProfile = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
+    try {
+        const userId = req.userId;
 
-    if (!userId) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Invalid user",
-      });
+        if (!userId) {
+            return res.status(401).json({
+                status: "fail",
+                message: "Invalid user",
+            });
+        }
+
+        const user = await User.findById(userId).select(
+            "username email avatar"
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "User fetched successfully",
+            data: {
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            message: "Can't find user profile",
+        });
     }
-
-    const user = await User.findById(userId).select(
-      "username email avatar"
-    );
-
-    if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
-    }
-
-    return res.status(200).json({
-      status: "success",
-      message: "User fetched successfully",
-      data: {
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar, 
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: "Can't find user profile",
-    });
-  }
 };
 
 // update user profile 
 export const updateProfile = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
-    const { username } = req.body;
-    const file = req.file as any;
+    try {
+        const userId = req.userId;
+        const { username } = req.body;
+        const file = req.file as any;
 
-    if (!userId) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Unauthorized",
-      });
+        if (!userId) {
+            return res.status(401).json({
+                status: "fail",
+                message: "Unauthorized",
+            });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found",
+            });
+        }
+
+        // update username
+        if (username) {
+            user.username = username;
+        }
+
+        // update avatar
+        if (file) {
+            // delete old avatar if it's not default
+            if (user.avatar && !user.avatar.includes("pixabay")) {
+                await deleteFromS3ByUrl(user.avatar);
+            }
+
+            // save public S3 URL
+            user.avatar = file.location;
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            status: "success",
+            message: "Profile updated",
+            data: {
+                id: user._id,
+                username: user.username,
+                avatar: user.avatar,
+            },
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            status: "error",
+            message: error.message,
+        });
     }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
-    }
-
-    // update username
-    if (username) {
-      user.username = username;
-    }
-
-    // update avatar
-    if (file) {
-      // delete old avatar if it's not default
-      if (user.avatar && !user.avatar.includes("pixabay")) {
-        await deleteFromS3ByUrl(user.avatar);
-      }
-
-      // save public S3 URL
-      user.avatar = file.location;
-    }
-
-    await user.save();
-
-    return res.status(200).json({
-      status: "success",
-      message: "Profile updated",
-      data: {
-        id: user._id,
-        username: user.username,
-        avatar: user.avatar,
-      },
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      status: "error",
-      message: error.message,
-    });
-  }
 };

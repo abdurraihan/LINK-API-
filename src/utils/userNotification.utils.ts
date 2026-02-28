@@ -1,7 +1,7 @@
 import { getMessaging } from "../utils/firebase.config.js";
 import { socketManager } from "./socket.manager.js";
 import UserToken from "../modules/user/userToken.model.js";
-import Notification, { INotification } from "../modules/notification/notification.model.js";
+import Notification, { INotification } from "../modules/userNotification/userNotification.model.js";
 import { Types } from "mongoose";
 
 interface NotificationPayload {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import notificationService from "./notification.service.js";
-import { sendNotification } from "../../utils/notification.utils.js"; // ✅ ADD THIS
-import { updateUserToken, removeUserToken } from "../../utils/notification.utils.js";
+import notificationService from "./userNotification.service.js";
+import { sendNotification } from "../../utils/userNotification.utils.js"; // ✅ ADD THIS
+import { updateUserToken, removeUserToken } from "../../utils/userNotification.utils.js";
 
 class NotificationController {
   /**

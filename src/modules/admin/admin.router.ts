@@ -33,4 +33,6 @@ router.post("/verify-otp", adminVerifyOTP);
 // Admin Reset Password Route
 router.post("/reset-password", adminResetPassword);
 
+
+
 export default router;

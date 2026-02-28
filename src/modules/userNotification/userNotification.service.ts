@@ -1,5 +1,5 @@
-import Notification, { INotification } from "./notification.model.js";
-import { sendNotification, sendBatchNotifications } from "../../utils/notification.utils.js";
+import Notification, { INotification } from "./userNotification.model.js";
+import { sendNotification, sendBatchNotifications } from "../../utils/userNotification.utils.js";
 import Follow from "../follow/follow.model.js";
 import User from "../user/user.model.js";
 import Channel from "../channel/channel.model.js";
