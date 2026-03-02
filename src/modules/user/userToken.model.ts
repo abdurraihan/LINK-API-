@@ -21,7 +21,7 @@ const userTokenSchema = new Schema<IUserToken>(
     },
     fcmToken: {
       type: String,
-      required: true,
+     // required: true, // admin don't need FCM token 
       unique: true,
     },
     deviceType: {

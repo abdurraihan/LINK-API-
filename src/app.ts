@@ -26,6 +26,7 @@ import bannerRoutes from "./modules/Banner/bannar.router.js";
 import userManagementRoutes from "./modules/userManagement/userManagement.router.js";
 import mangeContentRoutes from "./modules/manageContent/manageContent.router.js"
 import adminNotificationRoutes from "./modules/adminNotification/adminNotification.routes.js";
+import dashboardSummaryRoutes from "./modules/dashboardSummary/dashboardSummary.router.js"
 import { socketService } from "./utils/socket.utils.js";
 
 dotenv.config();
@@ -80,6 +81,7 @@ app.use("/api/v1/banners", bannerRoutes);
 app.use("/api/v1/user-management", userManagementRoutes);
 app.use("/api/v1/manage-contents",mangeContentRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
+app.use("/api/v1/dashboard-summary",dashboardSummaryRoutes)
 
 
 // Error handlers
