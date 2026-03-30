@@ -19,6 +19,50 @@ import {
 
 // Signup API with Email Verification
 
+// export const signup = async (req: Request, res: Response, next: NextFunction) => {
+//     const { username, email, password } = req.body;
+
+//     try {
+//         const existingUser = await User.findOne({ email });
+//         if (existingUser) {
+//             return res.status(400).json({ message: "Email already exists" });
+//         }
+
+//         const hashedPassword = await bcryptjs.hash(password, 10);
+//         const otp = generateOTP();
+
+//         const newUser = new User({
+//             username,
+//             email,
+//             password: hashedPassword,
+//             otp,
+//         });
+
+//         await newUser.save();
+
+//         try {
+//            // await sendOTPEmail(email, otp);
+//            console.log(otp);
+//             notifyAdminNewUser({
+//                 id: newUser._id.toString(),
+//                 username: newUser.username,
+//                 email: newUser.email,
+//                 avatar: newUser.avatar,
+//             });
+//         } catch (emailError) {
+
+//             await User.deleteOne({ _id: newUser._id });
+//             return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+//         }
+
+//         res.status(201).json({
+//             message: "User created. Please verify your email with the OTP."
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
 
@@ -40,19 +84,14 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
         await newUser.save();
 
-        try {
-            await sendOTPEmail(email, otp);
-            notifyAdminNewUser({
-                id: newUser._id.toString(),
-                username: newUser.username,
-                email: newUser.email,
-                avatar: newUser.avatar,
-            });
-        } catch (emailError) {
+        console.log(`OTP for ${email}: ${otp}`);
 
-            await User.deleteOne({ _id: newUser._id });
-            return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
-        }
+        notifyAdminNewUser({
+            id: newUser._id.toString(),
+            username: newUser.username,
+            email: newUser.email,
+            avatar: newUser.avatar,
+        });
 
         res.status(201).json({
             message: "User created. Please verify your email with the OTP."
@@ -61,7 +100,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
         next(error);
     }
 };
-
 
 // Verify Email API with OTP
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
@@ -93,8 +131,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email }).select('username email ');
-
+        const user = await User.findOne({ email }).select('username email password isVerified');
         if (!user) {
             return res.status(404).json({
                 status: "error",

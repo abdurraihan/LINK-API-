@@ -3,13 +3,13 @@ import User from "./user.model.js";
 import { sendOTPEmail } from "../../utils/sendEmail.js";
 import { generateOTP } from "../../utils/otp.js";
 import { deleteFromS3ByUrl } from "../../utils/deleteFromS3.js";
+import { notifyAdminNewUser } from "../../utils/adminNotification.utils.js";
 //import { getSignedAvatarUrl } from "../../utils/getSignedAvatarUrl.js";
 import { generateTokens, generateAccessToken, verifyRefreshToken } from "../../utils/jwt.utils.js";
 // User Auth API's start 
 // Signup API with Email Verification
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
-    console.log();
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -24,7 +24,19 @@ export const signup = async (req, res, next) => {
             otp,
         });
         await newUser.save();
-        await sendOTPEmail(email, otp);
+        try {
+            await sendOTPEmail(email, otp);
+            notifyAdminNewUser({
+                id: newUser._id.toString(),
+                username: newUser.username,
+                email: newUser.email,
+                avatar: newUser.avatar,
+            });
+        }
+        catch (emailError) {
+            await User.deleteOne({ _id: newUser._id });
+            return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+        }
         res.status(201).json({
             message: "User created. Please verify your email with the OTP."
         });

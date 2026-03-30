@@ -1,6 +1,7 @@
 import sgMail from "@sendgrid/mail";
-const apiKey = process.env.SENDGRID_API_KEY;
-const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+import { SENDGRID_API_KEY, SENDGRID_FROM_EMAIL } from "../config/config.js";
+const apiKey = SENDGRID_API_KEY;
+const fromEmail = SENDGRID_FROM_EMAIL;
 if (!apiKey || !fromEmail) {
     throw new Error("SendGrid env vars missing");
 }

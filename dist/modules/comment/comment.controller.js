@@ -1,5 +1,5 @@
 import Comment from "../comment/comment.model.js";
-import notificationService from "../notification/notification.service.js";
+import notificationService from "../userNotification/userNotification.service.js";
 import User from "../user/user.model.js";
 import Video from "../video/video.model.js";
 import Short from "../shorts/shorts.model.js";

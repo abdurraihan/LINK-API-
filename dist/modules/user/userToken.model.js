@@ -8,7 +8,7 @@ const userTokenSchema = new Schema({
     },
     fcmToken: {
         type: String,
-        required: true,
+        // required: true, // admin don't need FCM token 
         unique: true,
     },
     deviceType: {

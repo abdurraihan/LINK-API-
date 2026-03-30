@@ -24,7 +24,7 @@ const videoSchema = new Schema({
     hashtags: {
         type: [String],
         default: [],
-        index: true,
+        //index: true,
     },
     links: {
         type: [String],

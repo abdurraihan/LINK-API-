@@ -1,7 +1,7 @@
 import Video from "../../modules/video/video.model.js";
 import Channel from "../../modules/channel/channel.model.js";
 import { createTranscodeJob, getJobStatus } from "../../services/mediaConvert.service.js";
-import notificationService from "../notification/notification.service.js";
+import notificationService from "../userNotification/userNotification.service.js";
 import { S3_OUTPUT_BUCKET } from "../../config/config.js";
 import mongoose from "mongoose";
 export const createVideo = async (req, res) => {
