@@ -28,3 +28,6 @@ export const S3_IMAGE_BUCKET: string = process.env.S3_IMAGE_BUCKET!;
 export const MC_ROLE_ARN: string = process.env.MC_ROLE_ARN!;
 export const MC_ENDPOINT: string = process.env.MC_ENDPOINT!;
 export const CLOUDFRONT_URL: string = process.env.CLOUDFRONT_URL || "";
+
+// open AI 
+export const OPENAI_API_KEY:string = process.env.OPENAI_API_KEY! 

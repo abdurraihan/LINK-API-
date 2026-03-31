@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
-   
     "build": "tsc",
     "start": "node --import dotenv/config dist/server.js"
   },
@@ -29,6 +28,7 @@
     "mongoose-paginate-v2": "^1.9.1",
     "multer": "^2.0.2",
     "multer-s3": "^3.0.1",
+    "openai": "^6.33.0",
     "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   },
